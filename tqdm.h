@@ -11,6 +11,11 @@
 #include <vector>
 #include <math.h>
 #include <algorithm>
+#ifdef __linux__
+#include <sys/ioctl.h>
+#else
+#include <windows.h>
+#endif
 
 class tqdm {
     private:
@@ -34,7 +39,20 @@ class tqdm {
         bool is_tty = isatty(1);
         bool use_colors = true;
         bool color_transition = true;
-        int width = 40;
+        int width = []() {
+#ifdef __linux__
+          struct winsize win {};
+          ioctl(0, TIOCGWINSZ, &win);
+          unsigned short width = win.ws_col;
+#else
+          CONSOLE_SCREEN_BUFFER_INFO csbi;
+          GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+          unsigned short width = csbi.srWindow.Right - csbi.srWindow.Left;
+#endif
+          // return the space left for process bar 
+          // '60' is an experience value to exclude other output info, such as percent, time elapsed, etc.
+          return std::max((int)width - 60, 1);
+        }();
 
         std::string right_pad = "▏";
         std::string label = "";
