@@ -1,3 +1,31 @@
+/*
+ * https://github.com/aminnj/cpptqdm
+ * Python tqdm is nice. Need something similar for C++. That's this
+ * merged changes from 
+ * https://github.com/Unsigned-Long/cpptqdm/tree/adaptive-width
+ * Shuolong Chen shlchen@whu.edu.cn
+ *
+ * Copyright (c) 2018 Nick Amin
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 #ifndef TQDM_H
 #define TQDM_H
 #include <unistd.h>
@@ -11,7 +39,7 @@
 #include <vector>
 #include <math.h>
 #include <algorithm>
-#ifdef __linux__
+#if defined(__linux__) || defined(__APPLE__)
 #include <sys/ioctl.h>
 #else
 #include <windows.h>
@@ -40,7 +68,7 @@ class tqdm {
         bool use_colors = true;
         bool color_transition = true;
         int width = []() {
-#ifdef __linux__
+#if defined(__linux__) || defined(__APPLE__)
           struct winsize win {};
           ioctl(0, TIOCGWINSZ, &win);
           unsigned short width = win.ws_col;
